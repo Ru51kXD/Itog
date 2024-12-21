@@ -63,6 +63,12 @@ def save_result_to_file(result, file_path):
         file.write(result + "\n")
 
 score = 0
+
+@app.before_request
+def reset_score():
+    global score
+    score = 0
+
 # Функция для выполнения всех тестов
 def run_tests(file_path):
     # Проверяем наличие g++
@@ -164,10 +170,6 @@ def upload_file():
         return jsonify({"status": "УСПЕХ", "results": test_results,"score": score}), 200
     except Exception as e:
         return jsonify({"status": "Ошибка", "error": str(e)}), 500
-
-    
-    
-
 
 # Запуск приложения
 if __name__ == '__main__':

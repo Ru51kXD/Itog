@@ -6,56 +6,136 @@
     <title>JSON Viewer</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <style>
+        /* Ваши существующие стили */
         body {
-            background-color: #f8f9fa;
+            background: linear-gradient(to right, #6a11cb, #2575fc);
+            color: #fff;
+            font-family: 'Roboto', sans-serif;
             padding: 20px;
         }
+        h1, h2, h3, p {
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+        }
         .container {
-            margin-top: 50px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+            padding: 30px;
         }
         .drop-zone {
-            border: 2px dashed #007bff;
-            border-radius: 10px;
+            border: 2px dashed rgba(255, 255, 255, 0.6);
+            border-radius: 15px;
             padding: 30px;
             text-align: center;
             cursor: pointer;
-            background-color: #e9ecef;
-            transition: background-color 0.3s ease;
+            background: rgba(255, 255, 255, 0.2);
+            color: rgba(255, 255, 255, 0.8);
+            transition: background-color 0.3s ease, color 0.3s ease, box-shadow 0.3s ease;
         }
-        .drop-zone.dragover {
-            background-color: #d1e7ff;
+        .drop-zone:hover, .drop-zone.dragover {
+            background: rgba(255, 255, 255, 0.4);
+            color: #6a11cb;
+            box-shadow: 0 0 15px rgba(255, 255, 255, 0.7);
         }
         .drop-zone input {
             display: none;
         }
         .json-output {
-            background: #f4f4f4;
-            border: 1px solid #ddd;
+            background: rgba(0, 0, 0, 0.7);
+            border: 1px solid rgba(255, 255, 255, 0.4);
             padding: 15px;
-            border-radius: 5px;
-            font-family: monospace;
+            border-radius: 10px;
+            font-family: 'Courier New', monospace;
+            color: #00e676;
             white-space: pre-wrap;
             word-wrap: break-word;
         }
         .status-success {
-            color: green;
+            color: #00e676;
             font-weight: bold;
+            text-shadow: 0 2px 4px rgba(0, 255, 0, 0.3);
         }
         .status-failure {
-            color: red;
+            color: #ff5252;
             font-weight: bold;
+            text-shadow: 0 2px 4px rgba(255, 0, 0, 0.3);
         }
         #outputSection {
-            text-align: center;
+            background: rgba(255, 255, 255, 0.1);
+            padding: 20px;
+            border-radius: 15px;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
         }
         #resultsTable {
-            margin: 0 auto;
-            max-width: 80%;
+            width: 100%;
+            border-collapse: collapse;
+            background: rgba(255, 255, 255, 0.1);
+            margin: 20px 0;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
         }
         #resultsTable th, #resultsTable td {
+            padding: 15px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
             text-align: center;
+            color: rgba(255, 255, 255, 0.9);
+        }
+        #resultsTable th {
+            background: rgba(255, 255, 255, 0.2);
+            font-weight: bold;
+        }
+        
+        #resultsTable tbody tr:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
+        .form-label {
+            font-weight: bold;
+            color: rgba(255, 255, 255, 0.8);
+        }
+        input[type="file"] {
+            border: none;
+            border-radius: 5px;
+            background: rgba(255, 255, 255, 0.2);
+            color: rgba(255, 255, 255, 0.8);
+            padding: 10px;
+            transition: background-color 0.3s ease, box-shadow 0.3s ease;
+        }
+        input[type="file"]:hover {
+            background: rgba(255, 255, 255, 0.4);
+            box-shadow: 0 0 10px rgba(255, 255, 255, 0.7);
+        }
+        button {
+            background: linear-gradient(to right, #6a11cb, #2575fc);
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            padding: 10px 20px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background 0.3s ease, box-shadow 0.3s ease;
+        }
+        button:hover {
+            background: linear-gradient(to right, #2575fc, #6a11cb);
+            box-shadow: 0 0 10px rgba(255, 255, 255, 0.7);
+        }
+    
+        /* Добавленные стили для лучшей читабельности текста */
+        #resultsTable td, #resultsTable th {
+            color: #000; /* Чёрный текст */
+        }
+        #resultsTable tr:nth-child(odd) td {
+            background-color: rgba(230, 230, 230, 1); /* Светло-серый фон для нечётных строк */
+        }
+        #resultsTable tr:nth-child(even) td {
+            background-color: rgba(255, 255, 255, 0.9); /* Белый фон для чётных строк */
+        }
+        #resultsTable th {
+            background: rgba(0, 0, 0, 0.2); /* Заголовки таблицы с затемнением */
+            color: #fff; /* Белый текст заголовков */
         }
     </style>
+    
+    
 </head>
 <body>
     <div class="container">
@@ -73,8 +153,7 @@
         </div>
 
         <!-- JSON-данные -->
-        <h2 class="mt-4 text-center">Результаты</h2>
-        <div id="jsonOutput" class="json-output text-center">Здесь будет отображён JSON</div>
+        
 
         <div id="outputSection" class="mt-5" style="display:none;">
             <h3 class="text-center">Результаты</h3>
