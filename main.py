@@ -1,7 +1,7 @@
 import os
 import re
 import subprocess
-from flask import Flask, request, jsonify, render_template
+from flask import Flask, request, jsonify, render_template, session
 
 # Папки для загрузки файлов и хранения результатов
 UPLOAD_FOLDER = './uploads'
@@ -62,7 +62,7 @@ def save_result_to_file(result, file_path):
     with open(file_path, "a") as file:
         file.write(result + "\n")
 
-
+score = 0
 # Функция для выполнения всех тестов
 def run_tests(file_path):
     # Проверяем наличие g++
@@ -79,6 +79,7 @@ def run_tests(file_path):
 
     # Выполняем тесты
     results = []
+    global score
     for test_number in range(4):  # Четыре запуска: c = 0, 1, 2, 3
         try:
             # Читаем данные для текущего теста
@@ -111,10 +112,11 @@ def run_tests(file_path):
             # Сравниваем с ожидаемым результатом
             with open("test_output.txt", "r") as expected_file:
                 expected_outputs = expected_file.read().strip().splitlines()
-
+            
             if test_number < len(expected_outputs):
                 expected_output = expected_outputs[test_number]
                 if extracted_output == expected_output:
+                    score += 1
                     results.append({
                         "test_number": test_number + 1,
                         "status": "УСПЕХ",
@@ -122,13 +124,14 @@ def run_tests(file_path):
                         "expected_output": expected_output
                     })
                 else:
+                    score += 0
                     results.append({
                         "test_number": test_number + 1,
                         "status": "НЕУДАЧА",
                         "extracted_output": extracted_output,
                         "expected_output": expected_output
                     })
-
+                         
         except FileNotFoundError as e:
             results.append({"test_number": test_number + 1, "status": "Ошибка", "error": str(e)})
         except subprocess.TimeoutExpired:
@@ -154,11 +157,11 @@ def upload_file():
     # Сохраняем файл
     file_path = os.path.join(UPLOAD_FOLDER, file.filename)
     file.save(file_path)
-
+    
     # Запуск тестов
     try:
         test_results = run_tests(file_path)
-        return jsonify({"status": "УСПЕХ", "results": test_results}), 200
+        return jsonify({"status": "УСПЕХ", "results": test_results,"score": score}), 200
     except Exception as e:
         return jsonify({"status": "Ошибка", "error": str(e)}), 500
 
