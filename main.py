@@ -165,7 +165,11 @@ def upload_file():
     except Exception as e:
         return jsonify({"status": "Ошибка", "error": str(e)}), 500
 
+    
+    
+
 
 # Запуск приложения
 if __name__ == '__main__':
     app.run(debug=True)
+
